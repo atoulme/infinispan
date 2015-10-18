@@ -88,6 +88,7 @@ public class AtomicObjectFactoryTest extends MultipleCacheManagersTest {
         ExecutorService service = Executors.newCachedThreadPool();
         List<HashSet> sets = new ArrayList<HashSet>();
         List<AtomicObjectFactory> factories = new ArrayList<AtomicObjectFactory>();
+        List<ExerciseAtomicSetTask> tasks = new ArrayList<ExerciseAtomicSetTask>();
         List<Future<Integer>> futures = new ArrayList<Future<Integer>>();
 
         AtomicObjectFactory factory;
@@ -102,10 +103,12 @@ public class AtomicObjectFactoryTest extends MultipleCacheManagersTest {
             sets.add(set);
         }
 
+        
         for(Set s : sets){
-            futures.add(service.submit(new ExerciseAtomicSetTask(s, NCALLS)));
+            tasks.add(new ExerciseAtomicSetTask(s, NCALLS));
         }
 
+        futures.addAll(service.invokeAll(tasks));
         Integer total = 0;
         for(Future<Integer> future : futures){
             total += future.get();
